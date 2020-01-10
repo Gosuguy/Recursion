@@ -2,8 +2,8 @@
 // var stringifyJSON = JSON.stringify;
 
 // hard mode:
-var stringifyJSON = function(obj) {
-  var string = "";
+const stringifyJSON = function(obj) {
+  let string = "";
 
   if (typeof(obj) == "number" || typeof(obj) == "boolean") {
     string += obj.toString();
