@@ -29,7 +29,7 @@ const stringifyJSON = function(obj) {
     for (var key in obj) {
       if (typeof(key) != "function" && typeof(key) != "undefined") {
         string += stringifyJSON(key) + ":" + stringifyJSON(obj[key]);
-        if (obj[key] !== Object.keys(obj)[Object.keys(obj).length - 1]) {
+        if (key !== Object.keys(obj)[Object.keys(obj).length - 1]) {
           string += ',';
         }
       }
