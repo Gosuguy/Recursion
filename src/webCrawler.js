@@ -1,4 +1,4 @@
-const webCrawler = function (url){
+const webCrawler = function (url, depth = 0, configuration = 0){
 /* From wikipedia:
 A Web crawler starts with a list of URLs to visit, called the seeds. As the crawler visits these URLs, it identifies all the hyperlinks in the pages and adds them to the list of URLs to visit, called the crawl frontier. URLs from the frontier are recursively visited according to a set of policies. If the crawler is performing archiving of websites it copies and saves the information as it goes. The archives are usually stored in such a way they can be viewed, read and navigated as they were on the live web, but are preserved as ‘snapshots'.[4]
 The archive is known as the repository and is designed to store and manage the collection of web pages. The repository only stores HTML pages and these pages are stored as distinct files. A repository is similar to any other system that stores data, like a modern day database. The only difference is that a repository does not need all the functionality offered by a database system. The repository stores the most recent version of the web page retrieved by the crawler.[5]
@@ -17,18 +17,30 @@ Limit the depth or breadth of the crawl
 Set a revisit or politeness policy
  Refactor the crawler to use web workers 
 */
-  
+  let urlList = [url];
   // make API call of URL
-  $.get( url, function( data ) {
-    let currentlyCrawling = document.createElement('div');
-    currentlyCrawling.innerHTML = data;
-    let hyperlinks = currentlyCrawling.getElementsByTagName('a');
-    //console.log( "Hyperlinks Loaded: " + hyperlinks[100] );
-  });
-  
-  // based on what that returns, identify all hyperlinks
-    // call webCrawler on each hyperlink
-  return;
+  //console.log('DEPTH', depth);
+  if (depth > 0) {
+    $.get(url)
+    .done((data) => {
+    let hyperlinks = getHyperlinks(data);
+      for(let i = 0; i < hyperlinks.length; i++) {
+        //console.log('HYPERLINKS', hyperlinks[i].href)
+        urlList = urlList.concat(webCrawler(hyperlinks[i].href, depth - 1));
+      }
+      console.log('URL LIST', urlList)
+      return urlList;
+    });
+  } else { 
+  	return urlList;
+  }
+  return urlList;
 }
 
-console.log(webCrawler("https://www.msn.com/"));
+const getHyperlinks = (htmlObject) => {
+  let currentlyCrawling = document.createElement('div');
+  currentlyCrawling.innerHTML = htmlObject;
+  return currentlyCrawling.getElementsByTagName('a');
+}
+
+console.log('URL LIST-----------------', webCrawler("https://www.msn.com/", 1));
