@@ -1,3 +1,75 @@
+const webCrawler = function (url,  depth = 0,  configuration = 0){
+// configuration
+/*
+Tasks:
+Accept a URL to begin its crawl - done
+Recursively follow links - done
+Output the URL of crawled pages - done
+Accept an optional configuration object as an argument that will effect the default behavior of the crawler. Consider configuring:
+The ability to use getElementsByClassName on any of the pages you visit - omit
+The ability to output other kinds of information about the page such as 
+	number of script tags, 
+  distinct attributes, 
+  links to external sites, 
+  etc.
+The option to crawl breadth first instead of depth first
+Limit the depth or breadth of the crawl
+Set a revisit or politeness policy
+ Refactor the crawler to use web workers 
+*/
+  let urlList = [url];
+  let results = {0: urlList}
+  if (configuration === 1) {
+  	let scriptTagList = [];
+    results[1] = scriptTagList;
+  }
+  const crawl = (url, depth,  configuration) => {
+    if (depth > 0) {
+      $.get(url)
+      .then((data) => {
+      let hyperlinks = getHyperlinks(data, configuration);
+        for(let i = 0; i < hyperlinks[0].length; i++) {
+          urlList.push(hyperlinks[0][i].href);
+          crawl(hyperlinks[0][i].href, depth - 1);
+        }
+        console.log('HYPERLINKS', hyperlinks[1])
+        if (configuration === 1) {
+        console.log('ping');
+          results[1] = hyperlinks[1];
+        }
+        return;
+      });
+    } else { 
+      return;
+    }
+  }
+	crawl(url, depth,  configuration);
+  return results;
+}
+
+const getHyperlinks = (htmlObject, configuration) => {
+	let result = [];
+  let currentlyCrawling = document.createElement('div');
+  currentlyCrawling.innerHTML = htmlObject;
+  if (configuration === 1) {
+  	result.push(currentlyCrawling.getElementsByTagName('a'));
+    result.push(currentlyCrawling.getElementsByTagName('script').length)
+  }
+  return result;
+}
+
+console.log('RESULT ', webCrawler("https://www.msn.com/", 1, 0));
+
+
+
+
+
+
+
+
+
+
+/*
 const webCrawler = function (url, cb,  depth = 0,  configuration = 0){
 /* From wikipedia:
 A Web crawler starts with a list of URLs to visit, called the seeds. As the crawler visits these URLs, it identifies all the hyperlinks in the pages and adds them to the list of URLs to visit, called the crawl frontier. URLs from the frontier are recursively visited according to a set of policies. If the crawler is performing archiving of websites it copies and saves the information as it goes. The archives are usually stored in such a way they can be viewed, read and navigated as they were on the live web, but are preserved as ‘snapshots'.[4]
@@ -16,7 +88,7 @@ The option to crawl breadth first instead of depth first
 Limit the depth or breadth of the crawl
 Set a revisit or politeness policy
  Refactor the crawler to use web workers 
-*/
+
   let urlList = [url];
   if (depth > 0) {
     $.get(url)
@@ -39,53 +111,6 @@ const getHyperlinks = (htmlObject) => {
   return currentlyCrawling.getElementsByTagName('a');
 }
 
-/*
-webCrawler("https://www.msn.com/", console.log, 1);
-const webCrawler = function (url, depth = 0,  configuration = 0){
-// configuration
-/*
-Tasks:
-Accept a URL to begin its crawl
-Recursively follow links
-Output the URL of crawled pages
-Accept an optional configuration object as an argument that will effect the default behavior of the crawler. Consider configuring:
-The ability to use getElementsByClassName on any of the pages you visit
-The ability to output other kinds of information about the page such as number of script tags, distinct attributes, links to external sites, etc.
-The option to crawl breadth first instead of depth first
-Limit the depth or breadth of the crawl
-Set a revisit or politeness policy
- Refactor the crawler to use web workers 
-*/
-  let urlList = [url];
-  let results = {0: urlList}
-  if (configuration === 1) {
-  	let scriptTagList = [];
-    results[1] = scriptTagList;
-  }
-  const crawl = (url, depth,  configuration) => {
-    if (depth > 0) {
-      $.get(url)
-      .then((data) => {
-      let hyperlinks = getHyperlinks(data);
-        for(let i = 0; i < hyperlinks.length; i++) {
-          urlList.push(hyperlinks[i].href);
-          crawl(hyperlinks[i].href, depth - 1);
-        }
-          return;
-      });
-    } else { 
-      return;
-    }
-  }
-	crawl(url, depth,  configuration);
-  return urlList;
-}
-
-const getHyperlinks = (htmlObject) => {
-  let currentlyCrawling = document.createElement('div');
-  currentlyCrawling.innerHTML = htmlObject;
-  return currentlyCrawling.getElementsByTagName('a');
-}
 
 console.log('RESULT ', webCrawler("https://www.msn.com/", 1));
 */
