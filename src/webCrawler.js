@@ -1,4 +1,4 @@
-const webCrawler = function (url,  depth = 0,  configuration = 0){
+const webCrawler = function (url,  depth = 0,  configuration = 0, politeness = 0){
 /* configuration: 
    0 = url list, 
    1 = number of script tags, 
@@ -26,12 +26,16 @@ Set a revisit or politeness policy
   	var externalLinks = [];
     results[2] = externalLinks;
   }
-  const crawl = (url, depth,  configuration) => {
+  const crawl = (url, depth,  configuration, politeness) => {
     if (depth > 0) {
       $.get(url)
       .then((data) => {
       let hyperlinks = getHyperlinks(data, configuration);
-        for(let i = 0; i < hyperlinks[0].length; i++) {
+      let limit = hyperlinks[0].length;
+      if (politeness > 0) {
+      	limit = politeness;
+      }
+        for(let i = 0; i < limit; i++) {
           urlList.push(hyperlinks[0][i].href);
           if (configuration === 2 && !hyperlinks[0][i].href.includes(urlList[0])) {
           	externalLinks.push(hyperlinks[0][i].href);
@@ -47,7 +51,7 @@ Set a revisit or politeness policy
       return;
     }
   }
-	crawl(url, depth,  configuration);
+	crawl(url, depth,  configuration, politeness);
   return results;
 }
 
@@ -62,4 +66,4 @@ const getHyperlinks = (htmlObject, configuration) => {
   return result;
 }
 
-console.log('RESULT ', webCrawler("https://www.msn.com/", 1, 2));
+console.log('RESULT ', webCrawler("https://www.msn.com/", 1, 2, 100));
